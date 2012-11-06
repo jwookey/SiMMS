@@ -1,20 +1,18 @@
-%-------------------------------------------------------------------------------
+% SIS_AGGLOM_SPLITOPS
 %
-%  This software is distributed under the term of the BSD free software license.
-%
-%  Copyright:
-%     (c) 2003-2011, James Wookey, University of Bristol 
-%
-%  All rights reserved. See end of file for full license terms. 
-%
-%-------------------------------------------------------------------------------
-
-% AGGLOM_SPLITOPS
-function [SplitOpsOut] = agglom_SplitOps(SplitOps, fast_thresh)
+% // Part of SiMMS - Simple Matlab Modelling of Splitting //
 %
 %  Agglomerate splitting operators by summing sequential tlags where the fast  
-%  direction differs by less than fast_thresh
+%  direction differs by less than fast_thresh.
 %
+%  [SplitOpsOut] = SiS_agglom_SplitOps(SplitOps, fast_thresh)
+
+% Copyright (c) 2003-2012, James Wookey 
+% All rights reserved.
+% This software is distributed under the term of the BSD free software license.
+% See end of file for full license terms.
+
+function [SplitOpsOut] = SiS_agglom_SplitOps(SplitOps, fast_thresh)
    nRay = length(SplitOps)
    for iRay = 1:length(SplitOps)
       nOp2 = 0 ;
@@ -33,7 +31,7 @@ function [SplitOpsOut] = agglom_SplitOps(SplitOps, fast_thresh)
          else
 %        ** calculate angle difference
             df = SplitOps(iRay).fast(iOp) - fastc ;
-            df = unwind_pm_90(df) ;
+            df = SiS_unwind_pm_90(df) ;
 %        ** test to see if we can agglomerate
             if (df < fast_thresh) % we can agglomerate this one
                SplitOpsOut(iRay).tlag(nOp2) = ...
@@ -54,13 +52,12 @@ return
 %  This software is distributed under the term of the BSD free software license.
 %
 %  Copyright:
-%     (c) 2003-2011, James Wookey, University of Bristol 
+%     (c) 2003-2012, James Wookey, University of Bristol
 %
 %  All rights reserved.
 %
-%   * Redistribution and use in source and binary forms, with or without
-%     modification, are permitted provided that the following conditions are
-%     met:
+%   Redistribution and use in source and binary forms, with or without
+%   modification, are permitted provided that the following conditions are met:
 %        
 %   * Redistributions of source code must retain the above copyright notice,
 %     this list of conditions and the following disclaimer.

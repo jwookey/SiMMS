@@ -1,15 +1,18 @@
-%-------------------------------------------------------------------------------
+% SIS_INITSWAVE
 %
-%  This software is distributed under the term of the BSD free software license.
+% // Part of SiMMS - Simple Matlab Modelling of Splitting //
 %
-%  Copyright:
-%     (c) 2003-2011, James Wookey, University of Bristol 
+% Create a 3-component seismic record containing the initial shear-wave pulse. 
 %
-%  All rights reserved. See end of file for full license terms. 
+% [NTr,ETr,ZTr] = SiS_initSWave(SRCWav,SRCPol,NoiseAmp)
 %
-%-------------------------------------------------------------------------------
 
-function [NTr,ETr,ZTr] = InitSWave(SRCWav,SRCPol,NoiseAmp)
+% Copyright (c) 2003-2012, James Wookey 
+% All rights reserved.
+% This software is distributed under the term of the BSD free software license.
+% See end of file for full license terms.
+
+function [NTr,ETr,ZTr] = SiS_initSWave(SRCWav,SRCPol,NoiseAmp)
    
    if ~isscalar(SRCPol)
       error('A scalar is required for SRCPol') 
@@ -44,13 +47,12 @@ return
 %  This software is distributed under the term of the BSD free software license.
 %
 %  Copyright:
-%     (c) 2003-2011, James Wookey
+%     (c) 2003-2012, James Wookey, University of Bristol
 %
 %  All rights reserved.
 %
-%   * Redistribution and use in source and binary forms, with or without
-%     modification, are permitted provided that the following conditions are
-%     met:
+%   Redistribution and use in source and binary forms, with or without
+%   modification, are permitted provided that the following conditions are met:
 %        
 %   * Redistributions of source code must retain the above copyright notice,
 %     this list of conditions and the following disclaimer.

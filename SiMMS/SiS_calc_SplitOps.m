@@ -1,16 +1,25 @@
-%-------------------------------------------------------------------------------
+% SIS_CALC_SPLITOPS
 %
-%  This software is distributed under the term of the BSD free software license.
+% // Part of SiMMS - Simple Matlab Modelling of Splitting //
 %
-%  Copyright:
-%     (c) 2003-2011, James Wookey, University of Bristol 
+% Calculate Splitting Operators for a set of rays through an elastic model.  
 %
-%  All rights reserved. See end of file for full license terms. 
+% [SplitOps] = SiS_calc_SplitOps(InterpF, Elastic, Rays, MinAniZ, isoClass)
+% Inputs:
+%    InterpF  : interpolator structure to access the grid (see SiS_create_InterpF.m) 
+%    Elastic  : table of elastic constants (matrix)
+%    Rays     : structure containing a set of raypaths through the model (see, e.g, 
+%               SiS_create_VRays).
+%    MinAniZ  : cut-off anisotropy Z (anisotropy is suppressed below here) (float)
+%    isoClass : index of class representing isotropy (integer)
 %
-%-------------------------------------------------------------------------------
 
-% calc_agg_SWS_splitting
-function [SplitOps] = calc_SplitOps(InterpF, Elastic, Rays, MinAniZ, isoClass)
+% Copyright (c) 2003-2012, James Wookey 
+% All rights reserved.
+% This software is distributed under the term of the BSD free software license.
+% See end of file for full license terms.
+
+function [SplitOps] = SiS_calc_SplitOps(InterpF, Elastic, Rays, MinAniZ, isoClass)
 %
 %    
 %
@@ -63,13 +72,13 @@ function [SplitOps] = calc_SplitOps(InterpF, Elastic, Rays, MinAniZ, isoClass)
                         if ii~=jj, CC(jj,ii) = CC(ii,jj);, end ;
                      end
                   end
-                  rho = Elastic(ind_icc,23) * 1e3 ;
-                  CC = CC.*1e8./(rho./1e3) ;
-                  [pol,avs,vs1,vs2,vp] = CIJ_phasevels(CC,rho,inc,azi) ;
+                  rho = Elastic(ind_icc,23) ;
+
+                  [pol,avs,vs1,vs2,vp] = MS_phasevels(CC,rho,inc,azi) ;
                   
 %              ** calculate the splitting   
-                  ts1 = (dist./1e3)./vs1 ;
-                  ts2 = (dist./1e3)./vs2 ;
+                  ts1 = dist./vs1 ;
+                  ts2 = dist./vs2 ;
                   tlag = abs(ts1-ts2) ;
                   
                   SplitOps(iRay).tlag(iPtC) = tlag ;
@@ -93,13 +102,12 @@ return
 %  This software is distributed under the term of the BSD free software license.
 %
 %  Copyright:
-%     (c) 2003-2011, James Wookey
+%     (c) 2003-2012, James Wookey, University of Bristol
 %
 %  All rights reserved.
 %
-%   * Redistribution and use in source and binary forms, with or without
-%     modification, are permitted provided that the following conditions are
-%     met:
+%   Redistribution and use in source and binary forms, with or without
+%   modification, are permitted provided that the following conditions are met:
 %        
 %   * Redistributions of source code must retain the above copyright notice,
 %     this list of conditions and the following disclaimer.

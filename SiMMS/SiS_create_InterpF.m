@@ -1,20 +1,22 @@
-%-------------------------------------------------------------------------------
+% SIS_CREATE_INTERPF
 %
-%  This software is distributed under the term of the BSD free software license.
+% // Part of SiMMS - Simple Matlab Modelling of Splitting //
 %
-%  Copyright:
-%     (c) 2003-2011, James Wookey, University of Bristol 
+% Create a set of interpolation functions for the elastic model.
 %
-%  All rights reserved. See end of file for full license terms. 
+% [InterpF] = SiS_create_InterpF(Model)
 %
-%-------------------------------------------------------------------------------
+% Model should be a matrix with 4 columns:
+%  x y z i
+% where i is the anisotropy class index
 
-function [InterpF] = create_InterpF(Model)
-% Create a set of interpolation functions for the Model
-% Model should be a matrix with columns
+% Copyright (c) 2003-2012, James Wookey 
+% All rights reserved.
+% This software is distributed under the term of the BSD free software license.
+% See end of file for full license terms.
 
-% 1 2 3 4
-% x y z i
+
+function [InterpF] = SiS_create_InterpF(Model)
 
 InterpF = TriScatteredInterp(Model(:,1), Model(:,2), Model(:,3), Model(:,4), 'nearest') ;
 
@@ -25,13 +27,12 @@ end
 %  This software is distributed under the term of the BSD free software license.
 %
 %  Copyright:
-%     (c) 2003-2011, James Wookey
+%     (c) 2003-2012, James Wookey, University of Bristol
 %
 %  All rights reserved.
 %
-%   * Redistribution and use in source and binary forms, with or without
-%     modification, are permitted provided that the following conditions are
-%     met:
+%   Redistribution and use in source and binary forms, with or without
+%   modification, are permitted provided that the following conditions are met:
 %        
 %   * Redistributions of source code must retain the above copyright notice,
 %     this list of conditions and the following disclaimer.

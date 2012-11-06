@@ -1,15 +1,27 @@
-%-------------------------------------------------------------------------------
+% SIS_CREATE_SYNTHETICS
 %
-%  This software is distributed under the term of the BSD free software license.
+% // Part of SiMMS - Simple Matlab Modelling of Splitting //
 %
-%  Copyright:
-%     (c) 2003-2011, James Wookey, University of Bristol 
+%  Create synthetic data for (for example) SHEBA processing. Also create a handy  
+%   macro to run the analysis in sheba. 
 %
-%  All rights reserved. See end of file for full license terms. 
+% SiS_create_Synthetics(SRCWav, SRCPol, SplitOps, NoiseAmp, DDir)
+% Inputs:
+%    SRCWav   : SAC trace structure containing the source wavelet.
+%    SRCPol   : vector of source polarisations. 
+%    SplitOps : structure containing a set of splitting operators to apply to the
+%               data (see SiS_calc_SplitOps)
+%    NoiseAmp : amplitude of noise to apply to the trace. 
+%    DDir     : (pre-existing) directory to deliver the synthetic data to. 
 %
-%-------------------------------------------------------------------------------
 
-function create_Synthetics(SRCWav, SRCPol, SplitOps, NoiseAmp, DDir)
+% Copyright (c) 2003-2012, James Wookey 
+% All rights reserved.
+% This software is distributed under the term of the BSD free software license.
+% See end of file for full license terms.
+
+
+function SiS_create_Synthetics(SRCWav, SRCPol, SplitOps, NoiseAmp, DDir)
 %   
 %  Create the synthetic data for SHEBA processing. Also create a handy  
 %   macro to run the analysis in sheba. 
@@ -36,7 +48,7 @@ function create_Synthetics(SRCWav, SRCPol, SplitOps, NoiseAmp, DDir)
             round(SplitOps(iRay).y./1e3));
       
 %     ** make the initial wavelet
-         [NTr,ETr,ZTr] = InitSWave(STr,SRCPol(iPol),NoiseAmp) ;
+         [NTr,ETr,ZTr] = SiS_initSWave(STr,SRCPol(iPol),NoiseAmp) ;
 
          NTr.kcmpnm = 'N/X' ;
          ETr.kcmpnm = 'E/Y' ;
@@ -74,13 +86,12 @@ return
 %  This software is distributed under the term of the BSD free software license.
 %
 %  Copyright:
-%     (c) 2003-2011, James Wookey
+%     (c) 2003-2012, James Wookey, University of Bristol
 %
 %  All rights reserved.
 %
-%   * Redistribution and use in source and binary forms, with or without
-%     modification, are permitted provided that the following conditions are
-%     met:
+%   Redistribution and use in source and binary forms, with or without
+%   modification, are permitted provided that the following conditions are met:
 %        
 %   * Redistributions of source code must retain the above copyright notice,
 %     this list of conditions and the following disclaimer.
@@ -107,4 +118,3 @@ return
 %   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 %
 %-------------------------------------------------------------------------------
-

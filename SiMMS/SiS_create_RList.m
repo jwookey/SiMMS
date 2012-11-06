@@ -1,15 +1,25 @@
-%-------------------------------------------------------------------------------
+% SIS_CREATE_RLIST
 %
-%  This software is distributed under the term of the BSD free software license.
+% // Part of SiMMS - Simple Matlab Modelling of Splitting //
 %
-%  Copyright:
-%     (c) 2003-2011, James Wookey, University of Bristol 
+% Generate a list of receivers.  
 %
-%  All rights reserved. See end of file for full license terms. 
+% RList = SiS_create_Rlist(rx,ry,rz)
+% Inputs:
+%    InterpF  : interpolator structure to access the grid (see SiS_create_InterpF.m) 
+%    Elastic  : table of elastic constants (matrix)
+%    Rays     : structure containing a set of raypaths through the model (see, e.g, 
+%               SiS_create_VRays).
+%    MinAniZ  : cut-off anisotropy Z (anisotropy is suppressed below here) (float)
+%    isoClass : index of class representing isotropy (integer)
 %
-%-------------------------------------------------------------------------------
 
-function RList = create_Rlist(rx,ry,rz)
+% Copyright (c) 2003-2012, James Wookey 
+% All rights reserved.
+% This software is distributed under the term of the BSD free software license.
+% See end of file for full license terms.
+
+function RList = SiS_create_Rlist(rx,ry,rz)
    nr = length(rx)*length(ry)*length(rz)
    RList = zeros(nr,3) ;
    ir = 0
@@ -28,13 +38,12 @@ return
 %  This software is distributed under the term of the BSD free software license.
 %
 %  Copyright:
-%     (c) 2003-2011, James Wookey
+%     (c) 2003-2012, James Wookey, University of Bristol
 %
 %  All rights reserved.
 %
-%   * Redistribution and use in source and binary forms, with or without
-%     modification, are permitted provided that the following conditions are
-%     met:
+%   Redistribution and use in source and binary forms, with or without
+%   modification, are permitted provided that the following conditions are met:
 %        
 %   * Redistributions of source code must retain the above copyright notice,
 %     this list of conditions and the following disclaimer.

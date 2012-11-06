@@ -1,15 +1,21 @@
-%-------------------------------------------------------------------------------
+% SIS_CREATE_VRAYS
 %
-%  This software is distributed under the term of the BSD free software license.
+% // Part of SiMMS - Simple Matlab Modelling of Splitting //
 %
-%  Copyright:
-%     (c) 2003-2011, James Wookey, University of Bristol 
+% [Rays] = SiS_create_VRays(Model, RList, dz)
 %
-%  All rights reserved. See end of file for full license terms. 
+%  Create a set of vertical rays from a list of receiver locations.
+%  (3-col matrix, rx, ry, rz)
+%  rx, and ry should be within the model. rz may (or may not) be. 
+%  dz is the stepsize in the ray
 %
-%-------------------------------------------------------------------------------
 
-function [Rays] = create_VRays(Model, RList, dz)
+% Copyright (c) 2003-2012, James Wookey 
+% All rights reserved.
+% This software is distributed under the term of the BSD free software license.
+% See end of file for full license terms.
+
+function [Rays] = SiS_create_VRays(Model, RList, dz)
 %  Create a set of vertical rays from a list of receiver locations 
 %  (3-col matrix, rx, ry, rz)
 %  rx, and ry should be within the model. rz may (or may not) be. 
@@ -37,9 +43,6 @@ for iRay = 1:nRay
    else
       warning('Receiver outside the model - ignored.')
    end   
-   
-   
-   
 end   
      
 return
@@ -49,13 +52,12 @@ return
 %  This software is distributed under the term of the BSD free software license.
 %
 %  Copyright:
-%     (c) 2003-2011, James Wookey
+%     (c) 2003-2012, James Wookey, University of Bristol
 %
 %  All rights reserved.
 %
-%   * Redistribution and use in source and binary forms, with or without
-%     modification, are permitted provided that the following conditions are
-%     met:
+%   Redistribution and use in source and binary forms, with or without
+%   modification, are permitted provided that the following conditions are met:
 %        
 %   * Redistributions of source code must retain the above copyright notice,
 %     this list of conditions and the following disclaimer.
