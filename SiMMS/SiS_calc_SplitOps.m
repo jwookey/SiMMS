@@ -6,28 +6,33 @@
 %
 % [SplitOps] = SiS_calc_SplitOps(InterpF, Elastic, Rays, MinAniZ, isoClass)
 % Inputs:
-%    InterpF  : interpolator structure to access the grid (see SiS_create_InterpF.m) 
+%    InterpF  : interpolator structure to access the grid (see 
+%    SiS_create_InterpF.m) 
 %    Elastic  : table of elastic constants (matrix)
-%    Rays     : structure containing a set of raypaths through the model (see, e.g, 
-%               SiS_create_VRays).
-%    MinAniZ  : cut-off anisotropy Z (anisotropy is suppressed below here) (float)
+%    Rays     : structure containing a set of raypaths through the model (see,
+%               e.g, SiS_create_VRays).
+%    MinAniZ  : cut-off anisotropy Z (anisotropy is suppressed below here)
+%               (scalar)
 %    isoClass : index of class representing isotropy (integer)
 %
+% Outputs: 
+%    SplitOps : Structure containing the list of splitting operators, one per
+%               ray.  
 
 % Copyright (c) 2003-2012, James Wookey 
 % All rights reserved.
 % This software is distributed under the term of the BSD free software license.
 % See end of file for full license terms.
 
-function [SplitOps] = SiS_calc_SplitOps(InterpF, Elastic, Rays, MinAniZ, isoClass)
+function [SplitOps] = SiS_calc_SplitOps(InterpF, Elastic, Rays, ...
+                         MinAniZ, isoClass)
 %
-%    
+%  
 %
-   nRay = length(Rays)
+   nRay = length(Rays) ;
    for iRay = 1:length(Rays)
 
 %     Loop over points in the raypath, calculate the splitting operator
-      iRay
       iPtC = 0 ;
       nPts = length(Rays(iRay).x) ;
       
@@ -49,17 +54,19 @@ function [SplitOps] = SiS_calc_SplitOps(InterpF, Elastic, Rays, MinAniZ, isoClas
 
          mx = x1+(x2-x1)./2 ;  
          my = y1+(y2-y1)./2 ; 
-         mz = z1+(z2-z1)./2 ; 
+         mz = z1+(z2-z1)./2 ;
          
          if mz >= MinAniZ
-            azi = atan2((x2-x1),(y2-y1)).*180/pi ;
-      	   inc = atan((z2-z1)./sqrt((x2-x1).^2+(y2-y1).^2)).*180/pi ;      
+            %% note, this azi/inc points back along the ray
+            %% because of the way MS_phasevels defines angles.
+            %% since coordinate system is N-W-UP, azimuth is -.
+            azi = -SiS_unwind_pm_180(atan2((y2-y1),(x2-x1)).*180/pi + 180) ;
+      	   inc = -atan((z2-z1)./sqrt((x2-x1).^2+(y2-y1).^2)).*180/pi ;
       
 %        ** interpolate elastic constants to the midpoint
             CC = zeros(6,6) ;
-            icc = InterpF(mx,my,mz) ;
-            
-            if icc~=isoClass
+            icc = round(InterpF(mx,my,mz)) ;
+            if icc ~= isoClass
                ind_icc = find(Elastic(:,1)==icc) ;
                
                if ~isnan(icc) & ~isempty(ind_icc) ;
@@ -82,18 +89,16 @@ function [SplitOps] = SiS_calc_SplitOps(InterpF, Elastic, Rays, MinAniZ, isoClas
                   tlag = abs(ts1-ts2) ;
                   
                   SplitOps(iRay).tlag(iPtC) = tlag ;
-                  SplitOps(iRay).fast(iPtC) = pol ;
+                  SplitOps(iRay).fast(iPtC) = pol ; % Note, this is in the 
+                                                    %    *ray* frame
                else
-%                 ignore this segment            
+%                 Ignore this segment            
                end
             end   
          else
-%           ignore this segment            
-         end
-         
+%           Ignore this segment            
+         end % if mz >= MinAniZ
       end
-      
-
    end
 return
 

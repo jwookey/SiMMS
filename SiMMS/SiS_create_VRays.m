@@ -7,8 +7,8 @@
 %  Create a set of vertical rays from a list of receiver locations.
 %  (3-col matrix, rx, ry, rz)
 %  rx, and ry should be within the model. rz may (or may not) be. 
-%  dz is the stepsize in the ray
-%
+%  dz is the stepsize in the ray.
+%  Source is assumed to be the bottom of the model.
 
 % Copyright (c) 2003-2012, James Wookey 
 % All rights reserved.

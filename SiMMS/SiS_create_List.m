@@ -1,48 +1,27 @@
-% SIS_AGGLOM_SPLITOPS
+% SIS_CREATE_LIST
 %
 % // Part of SiMMS - Simple Matlab Modelling of Splitting //
 %
-%  Agglomerate splitting operators by summing sequential tlags where the fast  
-%  direction differs by less than fast_thresh.
+% Generate a list of receivers or sources.  
 %
-%  [SplitOpsOut] = SiS_agglom_SplitOps(SplitOps, fast_thresh)
+% RList = SiS_create_List(px,py,pz) ;
+%
 
 % Copyright (c) 2003-2012, James Wookey 
 % All rights reserved.
 % This software is distributed under the term of the BSD free software license.
 % See end of file for full license terms.
 
-function [SplitOpsOut] = SiS_agglom_SplitOps(SplitOps, fast_thresh)
-   nRay = length(SplitOps) ;
-   for iRay = 1:length(SplitOps)
-      nOp2 = 0 ;
-      SplitOpsOut(iRay).x = SplitOps(iRay).x ;
-      SplitOpsOut(iRay).y = SplitOps(iRay).y ;
-      SplitOpsOut(iRay).tlag = [] ;
-      SplitOpsOut(iRay).fast = [] ;
-      
-%  ** Loop over the splitting operators, gathering the ones which are the same
-      for iOp = 1:length(SplitOps(iRay).tlag)
-         if iOp==1
-            fastc = SplitOps(iRay).fast(iOp) ;
-            nOp2 = 1 ;
-            SplitOpsOut(iRay).tlag(nOp2) = SplitOps(iRay).tlag(iOp) ;
-            SplitOpsOut(iRay).fast(nOp2) = fastc ;
-         else
-%        ** calculate angle difference
-            df = SplitOps(iRay).fast(iOp) - fastc ;
-            df = SiS_unwind_pm_90(df) ;
-%        ** test to see if we can agglomerate
-            if (df < fast_thresh) % we can agglomerate this one
-               SplitOpsOut(iRay).tlag(nOp2) = ...
-                  SplitOpsOut(iRay).tlag(nOp2) + SplitOps(iRay).tlag(iOp) ;
-            else % need to start a new Operator   
-               nOp2 = nOp2 + 1;
-               SplitOpsOut(iRay).tlag(nOp2) = SplitOps(iRay).tlag(iOp) ;
-               SplitOpsOut(iRay).fast(nOp2) = SplitOps(iRay).fast(iOp) ;
-               fastc = SplitOps(iRay).fast(iOp) ;
-            end   
-         end   
+function List = SiS_create_List(px,py,pz)
+   nr = length(px)*length(py)*length(pz) ;
+   List = zeros(nr,3) ;
+   ir = 0 ;
+   for xx=px ;    
+      for yy = py
+         for zz = pz 
+            ir = ir+1 ;
+            List(ir,:) = [xx yy zz] ;
+         end
       end
    end
 return
@@ -84,4 +63,3 @@ return
 %   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 %
 %-------------------------------------------------------------------------------
-

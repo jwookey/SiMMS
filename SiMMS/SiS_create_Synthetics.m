@@ -20,6 +20,7 @@
 % This software is distributed under the term of the BSD free software license.
 % See end of file for full license terms.
 
+%FIXME: Check reference frame (need to put SRCPol into ray frame).
 
 function SiS_create_Synthetics(SRCWav, SRCPol, SplitOps, NoiseAmp, DDir)
 %   

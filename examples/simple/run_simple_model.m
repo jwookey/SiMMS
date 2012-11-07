@@ -9,6 +9,8 @@
 % This software is distributed under the term of the BSD free software license.
 % See end of file for full license terms.
 
+% See build_simple_model.m for model geometry
+
 % load the model and elastic class list.
 Model = load('SM_table.dat') ;
 Elastic = load('SM_Cij.dat') ;
@@ -17,27 +19,48 @@ Elastic = load('SM_Cij.dat') ;
 InterpF = SiS_create_InterpF(Model) ;
 
 % save these to a file for later use.
-save SM_Model Model Elastic InterpF
+%save SM_Model Model Elastic InterpF
 
 % make a list of receivers from rx, ry, rz vectors
-RList = SiS_create_RList([-75 -25 25 75],[0],[0]) ;
+RList = SiS_create_List([0],[0],[0]) ;
 
-% generate vertical rays
-Rays = SiS_create_VRays(Model, RList, 10)
+% make a list of sources from rx, ry, rz vectors
+SList = SiS_create_List([-40 40],[-40 0 40],[-300]) ;
+
+% generate non-vertical rays (one per source-receiver pair)
+Rays = SiS_create_Rays(Model, RList, SList, 10) ;
+
+figure
+plot3([Rays.x],[Rays.y],[Rays.z]);
+xlabel('x')
+ylabel('y')
+zlabel('z')
+
+daspect([1 1 1])
 
 % interpolate the anisotropic parameters
-% [SplitOps] = SiS_calc_SplitOps(InterpF, Elastic, Rays, MinAniZ, isoClass)
-[SplitOps] = SiS_calc_SplitOps(InterpF, Elastic, Rays, -400, 0)
+[SplitOpsRaw] = SiS_calc_SplitOps(InterpF, Elastic, Rays, -400, 0) ;
+
+%% NOTE: Fast directions are in ray frame.
 
 % agglomerate the splitting operators
-SplitOpsRaw = SplitOps ;
 [SplitOps] = SiS_agglom_SplitOps(SplitOpsRaw, 1.0) ;
-save SM_SplitOps.mat SplitOpsRaw SplitOps ;
+
+% combine the splitting operators
+[EffSplitOps] = SiS_combine_SplitOps(SplitOps, 0, 0.125) ;
+
+% convert to geographical reference frame
+[EffSplitOpsGRF] = SiS_to_geogrf(EffSplitOps, Rays) ;
+
+%FIXME: add plotting here.
+
+%save SM_SplitOps.mat SplitOpsRaw SplitOps EffSplitOps ;
+
 
 %% generate the synthetic data
-load SWavelet
-mkdir SM_synthetics('SM_synthetics') ;
-SiS_create_Synthetics(SWavelet,[30 45 60],SplitOps,0.01,'SM_synthetics') ;
+%load SWavelet
+%mkdir SM_synthetics('SM_synthetics') ;
+%SiS_create_Synthetics(SWavelet,[30 45 60],SplitOps,0.01,'SM_synthetics') ;
 
 %-------------------------------------------------------------------------------
 %

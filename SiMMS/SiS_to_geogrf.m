@@ -1,51 +1,33 @@
-% SIS_AGGLOM_SPLITOPS
+% SIS_TO_GEOGRF
 %
 % // Part of SiMMS - Simple Matlab Modelling of Splitting //
 %
-%  Agglomerate splitting operators by summing sequential tlags where the fast  
-%  direction differs by less than fast_thresh.
+%  Convert Splitting Operators to a geographical reference frame. 
 %
-%  [SplitOpsOut] = SiS_agglom_SplitOps(SplitOps, fast_thresh)
+%  [SplitOpsOut] = SiS_combine_SplitOps(SplitOps, InitPol, DFreq)
+%
+%  Inputs:
+%     SplitOps : Structure containing the splitting operators 
+%                (see SiS_calc_SplitOps)
+%     InitPol  : Initial wave polarisation (in the same reference frame as the
+%                fast direction in the splitting operators) (scalar, degrees)
+%     DFreq    : Dominant frequency (scalar, Hz)
 
 % Copyright (c) 2003-2012, James Wookey 
 % All rights reserved.
 % This software is distributed under the term of the BSD free software license.
 % See end of file for full license terms.
 
-function [SplitOpsOut] = SiS_agglom_SplitOps(SplitOps, fast_thresh)
+function [SplitOpsOut] = SiS_to_geogrf(SplitOps, Rays)
+   
+   SplitOpsOut = SplitOps ;
    nRay = length(SplitOps) ;
-   for iRay = 1:length(SplitOps)
-      nOp2 = 0 ;
-      SplitOpsOut(iRay).x = SplitOps(iRay).x ;
-      SplitOpsOut(iRay).y = SplitOps(iRay).y ;
-      SplitOpsOut(iRay).tlag = [] ;
-      SplitOpsOut(iRay).fast = [] ;
+   for iRay = 1:nRay
+      SplitOpsOut(iRay).fast = Rays(iRay).baz - SplitOps(iRay).fast ;
+      SplitOpsOut(iRay).fast = SiS_unwind_pm_90(SplitOpsOut(iRay).fast) ;
       
-%  ** Loop over the splitting operators, gathering the ones which are the same
-      for iOp = 1:length(SplitOps(iRay).tlag)
-         if iOp==1
-            fastc = SplitOps(iRay).fast(iOp) ;
-            nOp2 = 1 ;
-            SplitOpsOut(iRay).tlag(nOp2) = SplitOps(iRay).tlag(iOp) ;
-            SplitOpsOut(iRay).fast(nOp2) = fastc ;
-         else
-%        ** calculate angle difference
-            df = SplitOps(iRay).fast(iOp) - fastc ;
-            df = SiS_unwind_pm_90(df) ;
-%        ** test to see if we can agglomerate
-            if (df < fast_thresh) % we can agglomerate this one
-               SplitOpsOut(iRay).tlag(nOp2) = ...
-                  SplitOpsOut(iRay).tlag(nOp2) + SplitOps(iRay).tlag(iOp) ;
-            else % need to start a new Operator   
-               nOp2 = nOp2 + 1;
-               SplitOpsOut(iRay).tlag(nOp2) = SplitOps(iRay).tlag(iOp) ;
-               SplitOpsOut(iRay).fast(nOp2) = SplitOps(iRay).fast(iOp) ;
-               fastc = SplitOps(iRay).fast(iOp) ;
-            end   
-         end   
-      end
    end
-return
+end 
 
 %-------------------------------------------------------------------------------
 %
@@ -84,4 +66,3 @@ return
 %   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 %
 %-------------------------------------------------------------------------------
-

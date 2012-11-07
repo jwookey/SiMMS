@@ -2,25 +2,50 @@
 %
 % // Part of SiMMS - Simple Matlab Modelling of Splitting //
 %
-% This script builds description files needed for SiMMS for a simple anisotropic model.
+% This script builds description files needed for SiMMS for a simple 
+% anisotropic model.
+%
 % The model (side view) looks like:
 %
 %                             X
 %        -100                 0                 100
 %        0 |-------------------------------------|
 %          |                 (0)                 |
-%     -100 |-------------------------------------|
-%          |                  |                  |
-%  Z  -200 |                  |                  |
-%          |        (1)       |        (2)       |
+%     -100 |-------------------------------------|     X3
+%          |                  |                  |     ^
+%   Z -200 |                  |                  |     | 
+%          |        (1)       |        (2)       |     O-->X1
 %     -300 |                  |                  |
 %          |                  |                  |
 %     -400 |-------------------------------------|
 %
+% Top view:
+%
+%                Y
+%         50     0    -50
+%      100 |-----------|
+%          |           |
+%          |           |
+%       50 |           |          X1
+%          |           |          ^
+%          |           |          | 
+%     X  0 |    (0)    |     X2<--O
+%          |           |
+%          |           |
+%      -50 |           |
+%          |           |
+%          |           |
+%     -100 |-----------|
+%
+%
+%  X, Y and Z axes coincide with the X1,X2 and X3 elastic tensor principle
+%  axes. Distances are in km. 
 %
 %  Region (0) is isotropic. This doesn't need specification in the model. 
-%  Region (1) is 10% single crystal olivine with A-axis aligned in the X-direction
-%  Region (2) is 10% single crystal olivine with A-axis aligned in the Y-direction
+%  Region (1) is 10% single crystal olivine with A-axis aligned in the 
+%             X-direction
+%  Region (2) is 10% single crystal olivine with A-axis aligned in the 
+%             Y-direction
 %
 % Copyright (c) 2003-2012, James Wookey, University of Bristol
 % All rights reserved.
@@ -53,8 +78,8 @@ function build_simple_model()
                   aclass = 2 ;
                end
                % output
-               fprintf(fid,'%8.2f %8.2f %8.2f %2.2u\n',X(iX),Y(iY),Z(iZ),aclass) ;
             end % if Z(iZ)>-100
+            fprintf(fid,'%8.2f %8.2f %8.2f %2.2u\n',X(iX),Y(iY),Z(iZ),aclass) ;
          end % for iX=1:nX
       end % iY=1:nY
    end % for iZ=1:nZ

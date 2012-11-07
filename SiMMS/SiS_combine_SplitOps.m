@@ -1,37 +1,42 @@
-% SIS_CREATE_RLIST
+% SIS_COMBINE_SPLITOPS
 %
 % // Part of SiMMS - Simple Matlab Modelling of Splitting //
 %
-% Generate a list of receivers.  
+%  Combine splitting operators using the effective splitting equations 
+%     (Silver and Savage, 94).
 %
-% RList = SiS_create_Rlist(rx,ry,rz)
-% Inputs:
-%    InterpF  : interpolator structure to access the grid (see SiS_create_InterpF.m) 
-%    Elastic  : table of elastic constants (matrix)
-%    Rays     : structure containing a set of raypaths through the model (see, e.g, 
-%               SiS_create_VRays).
-%    MinAniZ  : cut-off anisotropy Z (anisotropy is suppressed below here) (float)
-%    isoClass : index of class representing isotropy (integer)
+%  [SplitOpsOut] = SiS_combine_SplitOps(SplitOps, InitPol, DFreq)
 %
+%  Inputs:
+%     SplitOps : Structure containing the splitting operators 
+%                (see SiS_calc_SplitOps)
+%     InitPol  : Initial wave polarisation (in the same reference frame as the
+%                fast direction in the splitting operators) (scalar, degrees)
+%     DFreq    : Dominant frequency (scalar, Hz)
 
 % Copyright (c) 2003-2012, James Wookey 
 % All rights reserved.
 % This software is distributed under the term of the BSD free software license.
 % See end of file for full license terms.
 
-function RList = SiS_create_Rlist(rx,ry,rz)
-   nr = length(rx)*length(ry)*length(rz)
-   RList = zeros(nr,3) ;
-   ir = 0
-   for xx=rx ;    
-      for yy = ry
-         for zz = rz 
-            ir = ir+1 ;
-            RList(ir,:) = [xx yy zz] ;
-         end
-      end
+function [SplitOpsOut] = SiS_combine_SplitOps(SplitOps, InitPol, DFreq)
+   nRay = length(SplitOps) ;
+   for iRay = 1:length(SplitOps)
+      SplitOpsOut(iRay).x = SplitOps(iRay).x ;
+      SplitOpsOut(iRay).y = SplitOps(iRay).y ;
+      SplitOpsOut(iRay).tlag = [] ;
+      SplitOpsOut(iRay).fast = [] ;
+      
+      nOp = length(SplitOps(iRay).tlag) ;
+
+%  ** calculate effective splitting.      
+      [SplitOpsOut(iRay).fast,SplitOpsOut(iRay).tlag] = ...
+         MS_effective_splitting_N(DFreq,InitPol, ...
+         SplitOps(iRay).fast, SplitOps(iRay).tlag) ;
+         
+      SplitOpsOut(iRay).fast = SiS_unwind_pm_90(SplitOpsOut(iRay).fast) ;
    end
-return
+end % function SiS_combine_SplitOps
 
 %-------------------------------------------------------------------------------
 %
