@@ -9,7 +9,8 @@
 % This software is distributed under the term of the BSD free software license.
 % See end of file for full license terms.
 
-% See build_simple_model.m for model geometry
+% Build the model
+build_simple_model() ;
 
 % load the model and elastic class list.
 Model = load('SM_table.dat') ;
@@ -30,18 +31,10 @@ SList = SiS_create_List([-40 40],[-40 0 40],[-300]) ;
 % generate non-vertical rays (one per source-receiver pair)
 Rays = SiS_create_Rays(Model, RList, SList, 10) ;
 
-figure
-plot3([Rays.x],[Rays.y],[Rays.z]);
-xlabel('x')
-ylabel('y')
-zlabel('z')
-
-daspect([1 1 1])
-
 % interpolate the anisotropic parameters
 [SplitOpsRaw] = SiS_calc_SplitOps(InterpF, Elastic, Rays, -400, 0) ;
 
-%% NOTE: Fast directions are in ray frame.
+%% NOTE: Fast directions are in ray frame at this point.
 
 % agglomerate the splitting operators
 [SplitOps] = SiS_agglom_SplitOps(SplitOpsRaw, 1.0) ;
@@ -52,7 +45,8 @@ daspect([1 1 1])
 % convert to geographical reference frame
 [EffSplitOpsGRF] = SiS_to_geogrf(EffSplitOps, Rays) ;
 
-%FIXME: add plotting here.
+% plot a splitting map
+SiS_plot_splitting_map(Model, EffSplitOpsGRF, Rays, 'src')
 
 %save SM_SplitOps.mat SplitOpsRaw SplitOps EffSplitOps ;
 
