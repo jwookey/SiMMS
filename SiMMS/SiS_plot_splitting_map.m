@@ -29,15 +29,6 @@ function [] = SiS_plot_splitting_map(Model, SplitOps, Rays, varargin)
    ymin = min(Model(:,2)); ymax = max(Model(:,2)) ;   
    zmin = min(Model(:,3)); zmax = max(Model(:,3)) ;   
    
-%   SplitOpsOut = SplitOps ;
-%   nRay = length(SplitOps) ;
-%   for iRay = 1:nRay
-%      SplitOpsOut(iRay).fast = Rays(iRay).baz - SplitOps(iRay).fast ;
-%      SplitOpsOut(iRay).fast = SiS_unwind_pm_90(SplitOpsOut(iRay).fast) ;
-%      
-%   end
-   
-
       pmode = 0  ;
 %  ** process the optional arguments
       iarg = 1 ;
@@ -86,6 +77,8 @@ function [] = SiS_plot_splitting_map(Model, SplitOps, Rays, varargin)
       daspect([1 1 1]) ;
       xlabel('X (km)') ;
       ylabel('Y (km)') ;
+      
+      
 end 
 
 %-------------------------------------------------------------------------------
