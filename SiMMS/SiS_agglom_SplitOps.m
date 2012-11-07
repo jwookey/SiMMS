@@ -13,39 +13,46 @@
 % See end of file for full license terms.
 
 function [SplitOpsOut] = SiS_agglom_SplitOps(SplitOps, fast_thresh)
-   nRay = length(SplitOps) ;
+%  loop over the rays.
    for iRay = 1:length(SplitOps)
       nOp2 = 0 ;
       SplitOpsOut(iRay).x = SplitOps(iRay).x ;
       SplitOpsOut(iRay).y = SplitOps(iRay).y ;
-      SplitOpsOut(iRay).tlag = [] ;
-      SplitOpsOut(iRay).fast = [] ;
+
+%  ** call the mighty agglomerator.       
+      [SplitOpsOut(iRay).fast,SplitOpsOut(iRay).tlag] = ...
+         agglom_SplitOps(SplitOps(iRay).fast, SplitOps(iRay).tlag, fast_thresh);
+      
+   end
+end
+
+function [afast,atlag] = agglom_SplitOps(fast,tlag,thresh)
+      atlag = [] ;
+      afast = [] ;
       
 %  ** Loop over the splitting operators, gathering the ones which are the same
-      for iOp = 1:length(SplitOps(iRay).tlag)
+      for iOp = 1:length(tlag)
          if iOp==1
-            fastc = SplitOps(iRay).fast(iOp) ;
+            fastc = fast(iOp) ;
             nOp2 = 1 ;
-            SplitOpsOut(iRay).tlag(nOp2) = SplitOps(iRay).tlag(iOp) ;
-            SplitOpsOut(iRay).fast(nOp2) = fastc ;
+            atlag(nOp2) = tlag(iOp) ;
+            afast(nOp2) = fastc ;
          else
 %        ** calculate angle difference
-            df = SplitOps(iRay).fast(iOp) - fastc ;
+            df = fast(iOp) - fastc ;
             df = SiS_unwind_pm_90(df) ;
 %        ** test to see if we can agglomerate
-            if (df < fast_thresh) % we can agglomerate this one
-               SplitOpsOut(iRay).tlag(nOp2) = ...
-                  SplitOpsOut(iRay).tlag(nOp2) + SplitOps(iRay).tlag(iOp) ;
+            if (abs(df) < thresh) % we can agglomerate this one
+               atlag(nOp2) = atlag(nOp2) + tlag(iOp) ;
             else % need to start a new Operator   
                nOp2 = nOp2 + 1;
-               SplitOpsOut(iRay).tlag(nOp2) = SplitOps(iRay).tlag(iOp) ;
-               SplitOpsOut(iRay).fast(nOp2) = SplitOps(iRay).fast(iOp) ;
-               fastc = SplitOps(iRay).fast(iOp) ;
+               atlag(nOp2) = tlag(iOp) ;
+               afast(nOp2) = fast(iOp) ;
+               fastc = fast(iOp) ;
             end   
          end   
       end
-   end
-return
+end
 
 %-------------------------------------------------------------------------------
 %
