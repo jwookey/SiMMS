@@ -13,10 +13,23 @@
 %     Rays     : Structure containing the raypaths
 %                (see SiS_calc_Rays).
 %  (Optional)
-%     'receiver' or 'rec' : (default) plot at receiver.
-%     'source' or 'src'   : plot at source. 
-%     'midpoint' or 'mid' : plot at midpoint (by depth).
-% 
+%     SiS_plot_splitting_map(...,'rec')  
+%        (default) plot splitting at receiver.
+%
+%     SiS_plot_splitting_map(...,'src')  
+%        plot splitting at source.
+%
+%     SiS_plot_splitting_map(...,'mid')  
+%        plot splitting at midpoint (by depth).
+%
+%     SiS_plot_splitting_map(...,'scale',MpS)  
+%        set the tlag plotting scale (km per second
+%        of splitting). This defaults to 10% of the maximum
+%        X extent of the model at the reference splitting time.
+%
+%     SiS_plot_splitting_map(...,'NoScaleBar')  
+%        Suppress the tlag scalebar.
+%
 
 % Copyright (c) 2003-2012, James Wookey 
 % All rights reserved.
@@ -30,10 +43,16 @@ function [] = SiS_plot_splitting_map(Model, SplitOps, Rays, varargin)
    zmin = min(Model(:,3)); zmax = max(Model(:,3)) ;   
    
       pmode = 0  ;
+      ScaleBar = 1 ;
+      scalef = NaN ;
+
 %  ** process the optional arguments
       iarg = 1 ;
       while iarg <= (length(varargin))
          switch lower(varargin{iarg})
+            case {'noscalebar'}
+               ScaleBar = 0 ;
+               iarg = iarg + 1 ;  
             case {'receiver','rec'}  
                pmode = 0 ;
                iarg = iarg + 1 ;
@@ -43,6 +62,9 @@ function [] = SiS_plot_splitting_map(Model, SplitOps, Rays, varargin)
             case {'midpoint','mid'}
                pmode = 2 ;
                iarg = iarg + 1 ;
+            case {'scale'}
+               scalef = varargin{iarg+1} ;
+               iarg = iarg + 2 ;
             otherwise 
                error(['Unknown option: ' varargin{iarg}]) ;   
          end   
@@ -59,9 +81,17 @@ function [] = SiS_plot_splitting_map(Model, SplitOps, Rays, varargin)
          xx = [Rays.xSrc]+([Rays.xRec]-[Rays.xSrc])/2 ;
          yy = [Rays.ySrc]+([Rays.yRec]-[Rays.ySrc])/2 ;
       end
+         
+%     calculate an appropriate reference splitting time
+      [ref_tlag,ref_str] = timescale([SplitOps.tlag]) ;
 
-%  ** generate splitting vectors
-      scalef = 20.0 ;
+      if isnan(scalef)
+         %scalef=0.1*(xmax-xmin) ; % note, this is for half the vector.
+
+         scalef=0.05*(xmax-xmin)./ref_tlag ;
+
+      end   
+
       q = scalef.*[SplitOps.tlag].*cosd([SplitOps.fast]) ;
       r = -scalef.*[SplitOps.tlag].*sind([SplitOps.fast]) ;
 
@@ -78,8 +108,58 @@ function [] = SiS_plot_splitting_map(Model, SplitOps, Rays, varargin)
       xlabel('X (km)') ;
       ylabel('Y (km)') ;
       
+
+%  ** if necessary, plot a scale bar.
+      if ScaleBar
+         
+
+
+         xSB = xmin + 2.* ref_tlag*scalef ;
+         ySB = ymin + (ymax-ymin)*0.1  ;
+         
+         xf1 = xmin + 0.5* ref_tlag*scalef ;
+         xf2 = xmin + 3.5* ref_tlag*scalef ;
+         yf1 = ymin + (ymax-ymin)*0.05  ;
+         yf2 = ymin + (ymax-ymin)*0.2  ;
+         
+         plot([xf1 xf2 xf2 xf1 xf1],[yf1 yf1 yf2 yf2 yf1],'k-')
+         
+         plot(xSB,ySB,'ko','MarkerFaceColor','k') ; hold on
+         quiver(xSB,ySB,ref_tlag*scalef,0,0,'k.','LineWidth',1.5) ;
+         quiver(xSB,ySB,-ref_tlag*scalef,0,0,'k.','LineWidth',1.5) ;
+         
+         text(xSB,ySB+(ymax-ymin)*0.02,ref_str,...
+         'HorizontalAlignment','Center','VerticalAlignment','Bottom') ;
+      end 
       
 end 
+
+function [refScale,refScaleStr] = timescale(Values) 
+
+   % use the mean value as the initial reference
+   
+   mv = mean(Values) ;
+   
+   refs=[0.1e-6,0.2e-6,0.5e-6,1.0e-6,2.0e-6,5.0e-6,10.0e-6,20.0e-6,50.0e-6,0.1e-3,...
+         0.2e-3,0.5e-3,1e-3,2e-3,5e-3,1e-2,2e-2,5e-2,1e-1,2e-1,5e-1,1e-0,2e-0,...
+         5e-0,10,20,50,100,200,500,1000,2000,5000,10000,20000,50000,100000,200000,...
+         500000,1000000,2000000,5000000] ;
+   
+   [~,i2] = min(abs(refs-mv)) ;
+   
+   refScale = refs(i2) ;
+   
+   refStrings = {'0.1\mus','0.2\mus','0.5\mus','1.0\mus','2\mus','5\mus',...
+                 '10\mus','20\mus','50\mus','0.1ms','0.2ms','0.5ms',...
+                 '1ms','2ms','5ms','10ms','20ms','50ms','0.1s',...
+                 '0.2s','0.5s','1s','2s','5s','10s','20s','50s',...
+                 '100s','200s','500s','1000s','2000s','5000s',...
+                 '10000s','20000s','50000s','100000s','200000s',...
+                 '500000s','1000000s','2000000s','5000000s'};
+               
+   refScaleStr = refStrings{i2} ;
+   
+end
 
 %-------------------------------------------------------------------------------
 %
