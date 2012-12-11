@@ -88,12 +88,12 @@ function [] = SiS_plot_splitting_map(Model, SplitOps, Rays, varargin)
       if isnan(scalef)
          %scalef=0.1*(xmax-xmin) ; % note, this is for half the vector.
 
-         scalef=0.05*(xmax-xmin)./ref_tlag ;
+         scalef=0.1*(xmax-xmin)./ref_tlag ;
 
       end   
 
-      q = scalef.*[SplitOps.tlag].*cosd([SplitOps.fast]) ;
-      r = -scalef.*[SplitOps.tlag].*sind([SplitOps.fast]) ;
+      q = 0.5*scalef.*[SplitOps.tlag].*cosd([SplitOps.fast]) ;
+      r = -0.5*scalef.*[SplitOps.tlag].*sind([SplitOps.fast]) ;
 
 %  ** make the figure
       figure
@@ -112,21 +112,19 @@ function [] = SiS_plot_splitting_map(Model, SplitOps, Rays, varargin)
 %  ** if necessary, plot a scale bar.
       if ScaleBar
          
-
-
-         xSB = xmin + 2.* ref_tlag*scalef ;
+         xSB = xmin + 2.* ref_tlag*0.5*scalef ;
          ySB = ymin + (ymax-ymin)*0.1  ;
          
-         xf1 = xmin + 0.5* ref_tlag*scalef ;
-         xf2 = xmin + 3.5* ref_tlag*scalef ;
+         xf1 = xmin + 0.5* ref_tlag*0.5*scalef ;
+         xf2 = xmin + 3.5* ref_tlag*0.5*scalef ;
          yf1 = ymin + (ymax-ymin)*0.05  ;
          yf2 = ymin + (ymax-ymin)*0.2  ;
          
          plot([xf1 xf2 xf2 xf1 xf1],[yf1 yf1 yf2 yf2 yf1],'k-')
          
          plot(xSB,ySB,'ko','MarkerFaceColor','k') ; hold on
-         quiver(xSB,ySB,ref_tlag*scalef,0,0,'k.','LineWidth',1.5) ;
-         quiver(xSB,ySB,-ref_tlag*scalef,0,0,'k.','LineWidth',1.5) ;
+         quiver(xSB,ySB,ref_tlag*0.5*scalef,0,0,'k.','LineWidth',1.5) ;
+         quiver(xSB,ySB,-ref_tlag*0.5*scalef,0,0,'k.','LineWidth',1.5) ;
          
          text(xSB,ySB+(ymax-ymin)*0.02,ref_str,...
          'HorizontalAlignment','Center','VerticalAlignment','Bottom') ;
