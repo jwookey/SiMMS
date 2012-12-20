@@ -40,6 +40,19 @@ for iRay = 1:nRay
       Rays(ii).z = [zmin:dz:RList(iRay,3)] ;
       Rays(ii).x = zeros(1,npts)+RList(iRay,1) ;
       Rays(ii).y = zeros(1,npts)+RList(iRay,2) ;
+      
+      Rays(ii).afv = 90.0 ; % Angle from vertical
+      Rays(ii).baz = NaN ; % Backazimuth is not defined
+      
+      % Recever positions
+      Rays(ii).xRec = RList(iRay,1) ;
+      Rays(ii).yRec = RList(iRay,2) ;
+      Rays(ii).zRec = RList(iRay,3) ;
+
+      % Source positions - at bottom of box
+      Rays(ii).xSrc = RList(iRay,1) ;
+      Rays(ii).ySrc = RList(iRay,2) ;
+      Rays(ii).zSrc = zmin ;
    else
       warning('Receiver outside the model - ignored.')
    end   
