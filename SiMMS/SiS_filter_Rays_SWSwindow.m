@@ -1,71 +1,63 @@
-% SIS_CREATE_VRAYS
+% SIS_FILTER_RAYS_SWSWINDOW
 %
 % // Part of SiMMS - Simple Matlab Modelling of Splitting //
 %
-% [Rays] = SiS_create_VRays(Model, RList, dz)
+% [Rays_out] = SiS_filter_Rays_SWSwindow(Rays_in ...)
 %
-%  Create a set of vertical rays from a list of receiver locations.
-%  (3-col matrix, rx, ry, rz)
-%  rx, and ry should be within the model. rz may (or may not) be. 
-%  dz is the stepsize in the ray.
-%  Source is assumed to be the bottom of the model.
+%  Remove any Rays from list where the angle from the vertical at the 
+%  recever is too large for SWS analysis.
+%
+%  Usage:
+%      [Rays_out] = SiS_filter_Rays_SWSwindow(Rays_in)
+%          Filter the input rays based on the default value for the 
+%          window (45 degrees from vertical).
+% 
+%      [Rays_out] = SiS_filter_Rays_SWSwindow(Rays_in, 'SWSwindow', value)
+%          Filter the input rays based on a non-default value for the 
+%          window (value degrees from vertical).
+%
 
-% Copyright (c) 2003-2012, James Wookey 
+% Copyright (c) 2012, Andrew Walker
 % All rights reserved.
 % This software is distributed under the term of the BSD free software license.
 % See end of file for full license terms.
 
-function [Rays] = SiS_create_VRays(Model, RList, dz)
-%  Create a set of vertical rays from a list of receiver locations 
-%  (3-col matrix, rx, ry, rz)
-%  rx, and ry should be within the model. rz may (or may not) be. 
-%  dz is the stepsize in the ray
+function [Rays_out] = SiS_filter_Rays_SWSwindow(Rays_in, varargin)
 
-xmin = min(Model(:,1)); xmax = max(Model(:,1)) ;   
-ymin = min(Model(:,2)); ymax = max(Model(:,2)) ;   
-zmin = min(Model(:,3)); zmax = max(Model(:,3)) ;   
+  SWS_window = 45 ; % Degrees from vert - default
 
-[nRay,ndum] = size(RList) ;
-
-%  Build rays to go from the maximum depth of the model
-
-ii = 0 ;
-
-for iRay = 1:nRay
-   if RList(iRay,1)>xmin & RList(iRay,1)<xmax & ...
-      RList(iRay,2)>ymin & RList(iRay,2)<ymax 
-      
-      ii = ii+1 ;
-      npts = length([zmin:dz:RList(iRay,3)]) ;
-      Rays(ii).z = [zmin:dz:RList(iRay,3)] ;
-      Rays(ii).x = zeros(1,npts)+RList(iRay,1) ;
-      Rays(ii).y = zeros(1,npts)+RList(iRay,2) ;
-      
-      Rays(ii).afv = 90.0 ; % Angle from vertical
-      Rays(ii).baz = NaN ; % Backazimuth is not defined
-      
-      % Recever positions
-      Rays(ii).xRec = RList(iRay,1) ;
-      Rays(ii).yRec = RList(iRay,2) ;
-      Rays(ii).zRec = RList(iRay,3) ;
-
-      % Source positions - at bottom of box
-      Rays(ii).xSrc = RList(iRay,1) ;
-      Rays(ii).ySrc = RList(iRay,2) ;
-      Rays(ii).zSrc = zmin ;
-   else
-      warning('Receiver outside the model - ignored.')
-   end   
-end   
-     
-return
+  % ** process the optional arguments
+      iarg = 1 ;
+      while iarg<=(length(varargin))
+         switch lower(varargin{iarg})
+            case 'swswindow'
+               SWS_window = varargin{iarg+1};
+               iarg = iarg + 2 ;
+            otherwise
+               error('Unknown optional argument') ;
+         end
+      end 
+  
+  i = 0;
+  
+  for iRay = 1:length(Rays_in)
+     if (Rays_in(iRay).afv < SWS_window)
+         i = i + 1;
+         Rays_out(i) = Rays_in(iRay);
+     end
+  end
+  
+  if (i == 0)
+      warning('All rays were outside the SWS window')
+  end
+end
 
 %-------------------------------------------------------------------------------
 %
 %  This software is distributed under the term of the BSD free software license.
 %
 %  Copyright:
-%     (c) 2003-2012, James Wookey, University of Bristol
+%     (c) 2003-2012, Andrew Walker, University of Bristol
 %
 %  All rights reserved.
 %
@@ -96,4 +88,5 @@ return
 %   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 %   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 %
-%-------------------------------------------------------------------------------
+%--------------------------------------------------------------------------
+%-----
