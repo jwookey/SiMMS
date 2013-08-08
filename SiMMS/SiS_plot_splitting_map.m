@@ -2,7 +2,8 @@
 %
 % // Part of SiMMS - Simple Matlab Modelling of Splitting //
 %
-%  Plot splitting operators in map view.
+%  Plot splitting operators in map view. Fast directions are relative to
+%  the x-axis by default. 
 %
 %  [] = SiS_plot_splitting_map(Model, SplitOps, Rays, ...)
 %
@@ -30,6 +31,10 @@
 %     SiS_plot_splitting_map(...,'NoScaleBar')  
 %        Suppress the tlag scalebar.
 %
+%     SiS_plot_splitting_map(...,'FDRefAxis',AxisStr)  
+%        Set the reference axis for fast directions. Must be 'x' or 'y',
+%        default is 'x'.
+%
 
 % Copyright (c) 2003-2012, James Wookey 
 % All rights reserved.
@@ -45,6 +50,7 @@ function [] = SiS_plot_splitting_map(Model, SplitOps, Rays, varargin)
       pmode = 0  ;
       ScaleBar = 1 ;
       scalef = NaN ;
+      AxisStr = 'X' ;
 
 %  ** process the optional arguments
       iarg = 1 ;
@@ -65,11 +71,16 @@ function [] = SiS_plot_splitting_map(Model, SplitOps, Rays, varargin)
             case {'scale'}
                scalef = varargin{iarg+1} ;
                iarg = iarg + 2 ;
+            case {'fdrefaxis'}
+               AxisStr = varargin{iarg+1} ;
+               iarg = iarg + 2 ;
             otherwise 
                error(['Unknown option: ' varargin{iarg}]) ;   
          end   
       end 
-
+      
+            
+      
 %  ** generate location vectors
       if pmode==0
          xx = [Rays.xRec] ;
@@ -92,8 +103,18 @@ function [] = SiS_plot_splitting_map(Model, SplitOps, Rays, varargin)
 
       end   
 
-      q = 0.5*scalef.*[SplitOps.tlag].*cosd([SplitOps.fast]) ;
-      r = -0.5*scalef.*[SplitOps.tlag].*sind([SplitOps.fast]) ;
+%  ** shift fast directions if necessary 
+      switch lower(AxisStr)
+      case 'x'  
+         q = 0.5*scalef.*[SplitOps.tlag].*cosd([SplitOps.fast]) ;
+         r = -0.5*scalef.*[SplitOps.tlag].*sind([SplitOps.fast]) ;
+      
+      case 'y'
+         q = 0.5*scalef.*[SplitOps.tlag].*sind([SplitOps.fast]) ;
+         r = 0.5*scalef.*[SplitOps.tlag].*cosd([SplitOps.fast]) ;
+      otherwise
+         error('FDRefAxis AxisStr argument must be ''x'' or ''y''') ;   
+      end   
 
 %  ** make the figure
       figure
