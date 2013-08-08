@@ -2,16 +2,31 @@
 %
 % // Part of SiMMS - Simple Matlab Modelling of Splitting //
 %
-% [Rays] = SiS_create_Rays(Model, RList, SList, ds)
+%  [Rays] = SiS_create_Rays(Model, RList, SList, ds, ...)
 %
 %  Create a set of straight rays from a list of source locations, to a list of receiver
 %  locations.
 %
-%  Receivers: (3-col matrix, rx, ry, rz)
+%  Model is the Model structure (an x,y,z,class matrix).
+%  
+%  INPUTS
+%  RList: (3-col matrix, rx, ry, rz)
 %     rx, and ry should be within the model. rz may (or may not) be. 
-%  Sources:   (3-col matrix, rx, ry, rz)
-%  sx, sy and sz should be within the model.
-%  dz is the stepsize in the ray
+%  SList:   (3-col matrix, rx, ry, rz)
+%     sx, sy and sz should be within the model.
+%  (RList and SList must be the same size for 'pairs' mode.)
+%  dz is the stepsize in the ray.
+% 
+%  OUTPUTS
+%     Rays : A structure containing the specified rays.
+%
+%  [Rays] = SiS_create_Rays(..., modeStr)
+%  mode = 'grid' (default)
+%     Rays are created from every specified source to every receiver (resulting
+%     in nsrc*nrec rays). 
+%  mode = 'pairs'
+%     A single ray is created between each pair of RList and SList entries
+%     (resulting in nsrc rays). 
 %
 
 % Copyright (c) 2003-2012, James Wookey 
