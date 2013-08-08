@@ -19,7 +19,37 @@
 % This software is distributed under the term of the BSD free software license.
 % See end of file for full license terms.
 
-function [Rays] = SiS_create_Rays(Model, RList, SList, dz)
+function [Rays] = SiS_create_Rays(Model, RList, SList, dz, varargin)
+
+ipairs = 0 ;
+
+iarg = 1 ;
+while iarg <= (length(varargin))
+   switch lower(varargin{iarg})
+      case 'pairs'
+         ipairs = 1 ;
+         iarg = iarg + 1 ;
+      case 'grid'
+         ipairs = 0 ;
+         iarg = iarg + 1;
+      otherwise 
+         error(['Unknown option: ' varargin{iarg}]) ;   
+   end   
+end 
+   
+if ipairs 
+   [Rays] = create_Rays_pairs(Model, RList, SList, dz) ;
+else
+   [Rays] = create_Rays_grid(Model, RList, SList, dz) ;
+end      
+   
+end
+
+function [Rays] = create_Rays_grid(Model, RList, SList, dz)
+
+%  ** process the optional arguments
+
+
 
 xmin = min(Model(:,1)); xmax = max(Model(:,1)) ;   
 ymin = min(Model(:,2)); ymax = max(Model(:,2)) ;   
@@ -87,7 +117,78 @@ for iRec = 1:nRec
       end   
 end   
      
-return
+end
+
+function [Rays] = create_Rays_pairs(Model, RList, SList, dz)
+
+   xmin = min(Model(:,1)); xmax = max(Model(:,1)) ;   
+   ymin = min(Model(:,2)); ymax = max(Model(:,2)) ;   
+   zmin = min(Model(:,3)); zmax = max(Model(:,3)) ;   
+
+
+[nRay,~] = size(RList) ;
+
+
+if length(SList)~=nRay
+   error('For pairs mode SList and RList must be the same length') ;
+end
+
+%  Build rays to go from the source to the receiver.
+
+ii = 0 ;
+
+for iRay = 1:nRay 
+      if RList(iRay,1)>xmin & RList(iRay,1)<xmax & ...
+         RList(iRay,2)>ymin & RList(iRay,2)<ymax 
+         if SList(iRay,1)>xmin & SList(iRay,1)<xmax & ...
+            SList(iRay,2)>ymin & SList(iRay,2)<ymax & ...
+            SList(iRay,3)>zmin & SList(iRay,3)<zmax
+         
+            ii = ii+1 ;
+            %% DO A RAY HERE.
+
+            Rays(ii).xRec = RList(iRay,1) ;
+            Rays(ii).yRec = RList(iRay,2) ;
+            Rays(ii).zRec = RList(iRay,3) ;
+
+            Rays(ii).xSrc = SList(iRay,1) ;
+            Rays(ii).ySrc = SList(iRay,2) ;
+            Rays(ii).zSrc = SList(iRay,3) ;
+
+            % calculate number of points (from Z distance travelled)
+            
+            % assign x,y,z arrays (using linspace)
+
+            npts = length([SList(iRay,3):dz:RList(iRay,3)]) ;
+            
+            Rays(ii).x = linspace(SList(iRay,1),RList(iRay,1),npts) ;
+            Rays(ii).y = linspace(SList(iRay,2),RList(iRay,2),npts) ;
+            Rays(ii).z = linspace(SList(iRay,3),RList(iRay,3),npts) ;
+            
+            %% calculate receiver backazimuth
+            
+            
+            Rays(ii).baz = -SiS_unwind_pm_180( ...
+               atan2((SList(iRay,2)-RList(iRay,2)), ... % dY
+                     (SList(iRay,1)-RList(iRay,1))) ... % dX
+               .*180/pi) ;
+               
+            %% calculate angle from vertical   
+            Rays(ii).afv = abs(atan(sqrt( ...
+                                (SList(iRay,1)-RList(iRay,1)).^2  + ... %dX
+                                (SList(iRay,2)-RList(iRay,2)).^2)./ ... %dY
+                                (SList(iRay,3)-RList(iRay,3)) ... %dZ
+                           ).*180/pi) ;
+               
+         else
+            warning('Source outside the model - ignored.')
+         end   
+      else
+         warning('Receiver outside the model - ignored.')
+      end   
+end   
+     
+end
 
 %-------------------------------------------------------------------------------
 %
